@@ -60,6 +60,7 @@ function update(delta) {
             bullet.update();
             if (bullet.y < 0) {
                 bullets.splice(index, 1);
+                hud.decreaseScore();
             }
         });
 
@@ -180,8 +181,12 @@ function invertEnemiesMovement() {
 function collisionSpaceShuttleEnemy() {
     enemies.forEach(function(enemy, index) {
         if (spaceShuttle.interceptsEnemy(enemy)) {
-            // destroy enemy
-            enemies.splice(index, 1);
+            // decrease enemy life
+            enemy.collisionWithSpaceShuttle();
+            // destroy enemy if needed
+            if (enemy.life <= 0) {
+                enemies.splice(index, 1);
+            }
             // decrease lives
             hud.lives--;
             // reset space shuttle position
@@ -195,14 +200,20 @@ function collisionSpaceShuttleEnemy() {
     });
 }
 function collisionBulletEnemy() {
-    enemies.forEach(function(enemy, index) {
-        for (bullet of bullets) {
+    enemies.forEach(function(enemy, enemyIndex) {
+        bullets.forEach(function(bullet, bulletIndex) {
             if (bullet.interceptsEnemy(enemy)) {
-                // destroy enemy
-                enemies.splice(index, 1);
+                // decrease enemy life
+                enemy.collisionWithBullet();
+                // destroy bullet
+                bullets.splice(bulletIndex, 1);
                 // increase score
-                hud.score++;
+                hud.increaseScore();
+                // destroy enemy if dead
+                if (enemy.life <= 0) {
+                    enemies.splice(enemyIndex, 1);
+                }
             }
-        }
+        });
     });
 }

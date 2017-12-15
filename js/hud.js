@@ -1,3 +1,6 @@
+var SCORE_STEP_INCREASE = 5;
+var SCORE_STEP_DECREASE = 2;
+
 var MAX_LIVES = 3;
 var HEART_IMAGE = document.getElementById('heart');
 var HEART_EMPTY_IMAGE = document.getElementById('heart_empty');
@@ -8,6 +11,16 @@ function Hud() {
 
     this.update = function() {
 
+    };
+
+    this.increaseScore = function() {
+        this.score += SCORE_STEP_INCREASE;
+    };
+    this.decreaseScore = function() {
+        this.score -= SCORE_STEP_DECREASE;
+        if (this.score < 0) {
+            this.score = 0;
+        }
     };
 
     this.render = function(context) {
