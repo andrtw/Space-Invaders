@@ -1,7 +1,7 @@
 function Bullet(spaceShuttle) {
     // dimension
-    this.width = 4;
-    this.height = 4;
+    this.width = 1;
+    this.height = 3;
     // position
     this.x = spaceShuttle.x + (spaceShuttle.width - this.width) / 2;
     this.y = spaceShuttle.y;

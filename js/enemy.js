@@ -1,4 +1,4 @@
-var ENEMY_SIZE = 20;
+var ENEMY_IMAGE = document.getElementById('enemy');
 
 function Enemy(y, xOffset=0) {
     // speed
@@ -6,15 +6,11 @@ function Enemy(y, xOffset=0) {
 
     this.name = name;
     // dimension
-    this.width = ENEMY_SIZE;
-    this.height = ENEMY_SIZE;
+    this.width = ENEMY_IMAGE.width;
+    this.height = ENEMY_IMAGE.height;
     // position
     this.x = (canvasWidth - this.width) / 2 + xOffset;
     this.y = y;
-    // color
-    var r = Math.floor(Math.random() * 256);
-    var g = Math.floor(Math.random() * 256);
-    var b = Math.floor(Math.random() * 256);
 
     this.update = function() {
         this.x += SPEED;
@@ -29,7 +25,6 @@ function Enemy(y, xOffset=0) {
     };
 
     this.render = function(context) {
-        context.fillStyle = 'rgb('+r+','+g+','+b+')';
-        context.fillRect(this.x, this.y, this.width, this.height);
+        context.drawImage(ENEMY_IMAGE, this.x, this.y);
     };
 }

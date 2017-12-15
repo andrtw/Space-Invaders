@@ -1,8 +1,10 @@
-var LIFE_SIZE = 6;
+var MAX_LIVES = 3;
+var HEART_IMAGE = document.getElementById('heart');
+var HEART_EMPTY_IMAGE = document.getElementById('heart_empty');
 
 function Hud() {
     this.score = 0;
-    this.lives = 3;
+    this.lives = MAX_LIVES;
 
     this.update = function() {
 
@@ -15,9 +17,12 @@ function Hud() {
         context.fillText('SCORE: ' + this.score, 10, canvasHeight - 10);
 
         // draw the lives
-        context.fillStyle = '#f00';
-        for (var i = 0; i < this.lives; i++) {
-            context.fillRect(10 + (10 * i), canvasHeight - 40, LIFE_SIZE, LIFE_SIZE);
+        for (var i = 0; i < MAX_LIVES; i++) {
+            var image = HEART_EMPTY_IMAGE;
+            if (i < this.lives) {
+                image = HEART_IMAGE;
+            }
+            context.drawImage(image, 10 + (16 * i), canvasHeight - 40);
         }
     };
 }

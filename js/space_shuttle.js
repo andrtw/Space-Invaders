@@ -1,12 +1,17 @@
-var SPACE_SHUTTLE_SIZE = 20;
+var FRAMES = [
+    document.getElementById('space_shuttle'),
+    document.getElementById('space_shuttle_2')
+];
+var frame = 0;
+var lastTime = Date.now();
 
 var MAX_SPEED = 6;
 var FRICTION = 0.92;
 
 function SpaceShuttle() {
     // dimension
-    this.width = SPACE_SHUTTLE_SIZE;
-    this.height = SPACE_SHUTTLE_SIZE;
+    this.width = FRAMES[0].width;
+    this.height = FRAMES[0].height;
     // position
     this.x = (canvasWidth - this.width) / 2;
     this.y = (canvasHeight - this.height) / 2;
@@ -56,11 +61,20 @@ function SpaceShuttle() {
         else if (this.y + this.height >= canvasHeight) {
             this.y = canvasHeight - this.height;
         }
+
+        // animation
+        var now = Date.now();
+        if (now - lastTime > 100) {
+            frame++;
+            if (frame >= FRAMES.length) {
+                frame = 0;
+            }
+            lastTime = now;
+        }
     };
 
     this.render = function(context) {
-        context.fillStyle = '#f00';
-        context.fillRect(this.x, this.y, this.width, this.height);
+        context.drawImage(FRAMES[frame], this.x, this.y);
     };
 
     this.interceptsEnemy = function(enemy) {

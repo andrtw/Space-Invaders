@@ -13,6 +13,11 @@ window.addEventListener('keyup', function(event) {
     var key = keyMap[event.keyCode];
     pressedKeys[key] = false;
 });
+window.addEventListener('click', function(event) {
+    if (gameOver) {
+        startNewGame();
+    }
+});
 var keyMap = {
     38: 'up', 87: 'up',
     39: 'right', 68: 'right',
@@ -33,47 +38,49 @@ var bullets = [];
 var enemies = [];
 var oneEnemyHasReachedTheBound = false;
 var hud = new Hud();
+var gameOver = false;
 
-startGame();
+startNewGame();
 
 // ============
 // == UPDATE ==
 // ============
 function update(delta) {
-    // spawn new bullet
-    if (pressedKeys.spacebar) {
-        spawnBullet();
-    }
-
-    // update the space shuttle
-    spaceShuttle.update(pressedKeys);
-
-    // update the bullets and remove them when out of screen
-    bullets.forEach(function(bullet, index) {
-        bullet.update();
-        if (bullet.y < 0) {
-            bullets.splice(index, 1);
+    if (!gameOver) {
+        // spawn new bullet
+        if (pressedKeys.spacebar) {
+            spawnBullet();
         }
-    });
 
-    // update the enemies
-    for (enemy of enemies) {
-        enemy.update();
-        if (enemy.boundReached()) {
-            oneEnemyHasReachedTheBound = true;
+        // update the space shuttle
+        spaceShuttle.update(pressedKeys);
+
+        // update the bullets and remove them when out of screen
+        bullets.forEach(function(bullet, index) {
+            bullet.update();
+            if (bullet.y < 0) {
+                bullets.splice(index, 1);
+            }
+        });
+
+        // update the enemies
+        for (enemy of enemies) {
+            enemy.update();
+            if (enemy.boundReached()) {
+                oneEnemyHasReachedTheBound = true;
+            }
         }
+        if (oneEnemyHasReachedTheBound) {
+            invertEnemiesMovement();
+        }
+
+        // collision detection
+        collisionSpaceShuttleEnemy();
+        collisionBulletEnemy();
+
+        // update the hud
+        hud.update();
     }
-    if (oneEnemyHasReachedTheBound) {
-        invertEnemiesMovement();
-    }
-
-    // collision detection
-    collisionSpaceShuttleEnemy();
-    collisionBulletEnemy();
-
-    // update the hud
-    hud.update();
-
 }
 
 // ============
@@ -83,21 +90,36 @@ function render() {
     // clear the canvas
     context.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    // draw the space shuttle
-    spaceShuttle.render(context);
+    if (!gameOver) {
+        // draw the space shuttle
+        spaceShuttle.render(context);
 
-    // draw the bullets
-    for (bullet of bullets) {
-        bullet.render(context);
+        // draw the bullets
+        for (bullet of bullets) {
+            bullet.render(context);
+        }
+
+        // draw the enemies
+        for (enemy of enemies) {
+            enemy.render(context);
+        }
+
+        // draw the hud
+        hud.render(context);
     }
 
-    // draw the enemies
-    for (enemy of enemies) {
-        enemy.render(context);
+    if (gameOver) {
+        context.font = '30px Consolas';
+        context.fillStyle = '#ddd';
+        var text = 'GAME OVER';
+        context.fillText(text, (canvasWidth - context.measureText(text).width) / 2, canvasHeight / 2);
+        context.font = '18px Consolas';
+        text = 'With score: ' + hud.score;
+        context.fillText(text, (canvasWidth - context.measureText(text).width) / 2, canvasHeight / 2 + 30);
+        context.font = '12px Consolas';
+        text = 'Click to play again';
+        context.fillText(text, (canvasWidth - context.measureText(text).width) / 2, canvasHeight / 2 + 50);
     }
-
-    // draw the hud
-    hud.render(context);
 }
 
 // ===============
@@ -118,7 +140,13 @@ window.requestAnimationFrame(loop);
 // =============================================
 
 // start game
-function startGame() {
+function startNewGame() {
+    spaceShuttle = new SpaceShuttle();
+    bullets = [];
+    enemies = [];
+    oneEnemyHasReachedTheBound = false;
+    hud = new Hud();
+    gameOver = false;
     spawnEnemyGroup();
 }
 
@@ -159,6 +187,10 @@ function collisionSpaceShuttleEnemy() {
             // reset space shuttle position
             spaceShuttle.x = canvasWidth / 2;
             spaceShuttle.y = canvasHeight / 2;
+
+            if (hud.lives <= 0) {
+                gameOver = true;
+            }
         }
     });
 }
