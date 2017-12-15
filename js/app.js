@@ -29,12 +29,28 @@ var pressedKeys = {
 };
 
 var spaceShuttle = new SpaceShuttle(canvasWidth, canvasHeight);
+var bullets = [];
 
 // ============
 // == UPDATE ==
 // ============
 function update(delta) {
+    // spawn new bullet
+    if (pressedKeys.spacebar) {
+        spawnBullet();
+    }
+
+    // update the space shuttle
     spaceShuttle.update(pressedKeys);
+
+    // update the bullets and remove them when out of screen
+    bullets.forEach(function(bullet, index) {
+        if (bullet.y < 0) {
+            bullets.splice(index, 1);
+            return;
+        }
+        bullet.update();
+    });
 }
 
 // ============
@@ -43,7 +59,14 @@ function update(delta) {
 function render() {
     // clear the canvas
     context.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    // draw the space shuttle
     spaceShuttle.render(context);
+
+    // draw the bullets
+    for (bullet of bullets) {
+        bullet.render(context);
+    }
 }
 
 // ===============
@@ -60,3 +83,8 @@ function loop(timestamp) {
 }
 var lastRender = 0;
 window.requestAnimationFrame(loop);
+
+function spawnBullet() {
+    var bullet = new Bullet(spaceShuttle);
+    bullets.push(bullet);
+}

@@ -14,7 +14,6 @@ function SpaceShuttle(canvasWidth, canvasHeight) {
     this.velX = 0;
     this.velY = 0;
 
-    // movement
     this.update = function(pressedKeys) {
         // check which direction to move
         if (pressedKeys.up) {
@@ -59,7 +58,6 @@ function SpaceShuttle(canvasWidth, canvasHeight) {
         }
     };
 
-    // draw
     this.render = function(context) {
         context.fillStyle = '#f00';
         context.fillRect(this.x, this.y, this.width, this.height);
