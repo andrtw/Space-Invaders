@@ -14,4 +14,13 @@ function Bullet(spaceShuttle) {
         context.fillStyle = '#0f0';
         context.fillRect(this.x, this.y, this.width, this.height);
     };
+
+    this.interceptsEnemy = function(enemy) {
+        if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width) {
+            if (this.y + this.height > enemy.y && this.y < enemy.y + enemy.height) {
+                return true;
+            }
+        }
+        return false;
+    };
 }

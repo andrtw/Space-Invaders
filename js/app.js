@@ -32,7 +32,8 @@ var spaceShuttle = new SpaceShuttle(canvasWidth, canvasHeight);
 var bullets = [];
 var enemies = [];
 var oneEnemyHasReachedTheBound = false;
-spawnEnemyGroup();
+
+startGame();
 
 // ============
 // == UPDATE ==
@@ -48,11 +49,10 @@ function update(delta) {
 
     // update the bullets and remove them when out of screen
     bullets.forEach(function(bullet, index) {
+        bullet.update();
         if (bullet.y < 0) {
             bullets.splice(index, 1);
-            return;
         }
-        bullet.update();
     });
 
     // update the enemies
@@ -65,6 +65,10 @@ function update(delta) {
     if (oneEnemyHasReachedTheBound) {
         invertEnemiesMovement();
     }
+
+    collisionSpaceShuttleEnemy();
+    collisionBulletEnemy();
+
 }
 
 // ============
@@ -103,6 +107,14 @@ function loop(timestamp) {
 var lastRender = 0;
 window.requestAnimationFrame(loop);
 
+// =============================================
+
+// start game
+function startGame() {
+    spawnEnemyGroup();
+}
+
+// spawn functions
 function spawnBullet() {
     var bullet = new Bullet(spaceShuttle);
     bullets.push(bullet);
@@ -126,4 +138,22 @@ function invertEnemiesMovement() {
         enemy.invertMovement();
     }
     oneEnemyHasReachedTheBound = false;
+}
+
+// collision functions
+function collisionSpaceShuttleEnemy() {
+    enemies.forEach(function(enemy, index) {
+        if (spaceShuttle.interceptsEnemy(enemy)) {
+            enemies.splice(index, 1);
+        }
+    });
+}
+function collisionBulletEnemy() {
+    enemies.forEach(function(enemy, index) {
+        for (bullet of bullets) {
+            if (bullet.interceptsEnemy(enemy)) {
+                enemies.splice(index, 1);
+            }
+        }
+    });
 }
