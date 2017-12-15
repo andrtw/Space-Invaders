@@ -33,14 +33,15 @@ var pressedKeys = {
     spacebar: false
 };
 
-var spaceShuttle = new SpaceShuttle();
-var bullets = [];
-var enemies = [];
-var explosions = [];
-var oneEnemyHasReachedTheBound = false;
-var hud = new Hud();
-var gameOver = false;
-var gameWin = false;
+var spaceShuttle;
+var bullets;
+var enemyBullets;
+var enemies;
+var explosions;
+var oneEnemyHasReachedTheBound;
+var hud;
+var gameOver;
+var gameWin;
 
 startNewGame();
 
@@ -48,6 +49,11 @@ startNewGame();
 // == UPDATE ==
 // ============
 function update(delta) {
+    // no more enemies to kill (game ended or next level)
+    // wait for the last enemy explosion to finish
+    if (enemies.length <= 0 && explosions.length <= 0) {
+        gameWin = true;
+    }
 
     if (!gameOver && !gameWin) {
         // spawn new bullet
@@ -66,12 +72,25 @@ function update(delta) {
                 hud.decreaseScore();
             }
         });
+        enemyBullets.forEach(function(enemyBullet, index) {
+            enemyBullet.update();
+            if (enemyBullet.y + enemyBullet.height > canvasHeight) {
+                enemyBullets.splice(index, 1);
+            }
+        });
 
         // update the enemies
         for (enemy of enemies) {
             enemy.update();
             if (enemy.boundReached()) {
                 oneEnemyHasReachedTheBound = true;
+            }
+
+            // make enemies shoot when they are close enough to space shuttle
+            if (enemy.x + enemy.width > spaceShuttle.x &&
+                enemy.x < spaceShuttle.x + spaceShuttle.width &&
+                enemy.y + enemy.height < spaceShuttle.y) {
+                    spawnEnemyBullet(enemy);
             }
         }
         if (oneEnemyHasReachedTheBound) {
@@ -89,14 +108,10 @@ function update(delta) {
         // collision detection
         collisionSpaceShuttleEnemy();
         collisionBulletEnemy();
+        collisionBulletSpaceShuttle();
 
         // update the hud
         hud.update();
-
-        // no more enemies to kill (game ended or next level)
-        if (enemies.length <= 0) {
-            gameWin = true;
-        }
     }
 }
 
@@ -114,6 +129,9 @@ function render() {
         // draw the bullets
         for (bullet of bullets) {
             bullet.render(context);
+        }
+        for (enemyBullet of enemyBullets) {
+            enemyBullet.render(context);
         }
 
         // draw the enemies
@@ -140,7 +158,7 @@ function render() {
         smallTextCenter('With score: ' + hud.score, 30);
         tinyTextCenter('Go to next level', 50);
 
-        // TODO: implement level system (never)
+        // TODO: implement level system... probably never
     }
 }
 
@@ -165,6 +183,7 @@ window.requestAnimationFrame(loop);
 function startNewGame() {
     spaceShuttle = new SpaceShuttle();
     bullets = [];
+    enemyBullets = [];
     enemies = [];
     explosions = [];
     oneEnemyHasReachedTheBound = false;
@@ -180,19 +199,22 @@ function spawnBullet() {
     var bullet = new Bullet(spaceShuttle);
     bullets.push(bullet);
 }
+function spawnEnemyBullet(enemy) {
+    var enemyBullet = new Bullet(enemy, true);
+    enemyBullets.push(enemyBullet);
+}
 function spawnEnemy(y, xOffset=0) {
     var enemy = new Enemy(y, xOffset);
     enemies.push(enemy);
 }
 function spawnEnemyGroup() {
     // first row
-    spawnEnemy(10, -100);
-    spawnEnemy(10, );
-    spawnEnemy(10, 100);
+    spawnEnemy(10, -140);
+    spawnEnemy(10);
+    spawnEnemy(10, 140);
     // second row
-    spawnEnemy(60, -100);
-    spawnEnemy(60, );
-    spawnEnemy(60, 100);
+    spawnEnemy(80, -80);
+    spawnEnemy(80, 80);
 }
 function spawnExplosion(entity) {
     var explosion = new Explosion(entity);
@@ -218,12 +240,11 @@ function collisionSpaceShuttleEnemy() {
                 spawnExplosion(enemy);
                 enemies.splice(index, 1);
             }
-            // decrease lives
-            hud.lives--;
-            // reset space shuttle to original position
+            // die
+            spawnExplosion(spaceShuttle);
             spaceShuttle.die();
 
-            if (hud.lives <= 0) {
+            if (spaceShuttle.lives <= 0) {
                 gameOver = true;
             }
         }
@@ -232,7 +253,7 @@ function collisionSpaceShuttleEnemy() {
 function collisionBulletEnemy() {
     enemies.forEach(function(enemy, enemyIndex) {
         bullets.forEach(function(bullet, bulletIndex) {
-            if (bullet.interceptsEnemy(enemy)) {
+            if (bullet.intercepts(enemy)) {
                 // decrease enemy life
                 enemy.collisionWithBullet();
                 // destroy bullet
@@ -246,6 +267,25 @@ function collisionBulletEnemy() {
                 }
             }
         });
+    });
+}
+function collisionBulletSpaceShuttle() {
+    enemyBullets.forEach(function(enemyBullet, index) {
+        if (enemyBullet.intercepts(spaceShuttle)) {
+            // decrease space shuttle life
+            spaceShuttle.collisionWithBullet();
+            // destroy enemy bullet
+            enemyBullets.splice(index, 1);
+            // lose one life if necessary
+            if (spaceShuttle.life <= 0) {
+                spawnExplosion(spaceShuttle);
+                spaceShuttle.die();
+
+                if (spaceShuttle.lives <= 0) {
+                    gameOver = true;
+                }
+            }
+        }
     });
 }
 

@@ -1,23 +1,34 @@
-function Bullet(spaceShuttle) {
+function Bullet(entity, enemyBullet=false) {
+    var SPEED = 10;
+
     // dimension
-    this.width = 1;
+    this.width = 2;
     this.height = 3;
     // position
-    this.x = spaceShuttle.x + (spaceShuttle.width - this.width) / 2;
-    this.y = spaceShuttle.y;
+    this.x = entity.x + (entity.width - this.width) / 2;
+    this.y = entity.y;
 
     this.update = function() {
-        this.y -= 10;
+        if (enemyBullet) {
+            this.y += SPEED;
+        }
+        else {
+            this.y -= SPEED;
+        }
     };
 
     this.render = function(context) {
-        context.fillStyle = '#0f0';
+        var color = '#0f0';
+        if (enemyBullet) {
+            color = '#f00';
+        }
+        context.fillStyle = color;
         context.fillRect(this.x, this.y, this.width, this.height);
     };
 
-    this.interceptsEnemy = function(enemy) {
-        if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width) {
-            if (this.y + this.height > enemy.y && this.y < enemy.y + enemy.height) {
+    this.intercepts = function(entity) {
+        if (this.x + this.width > entity.x && this.x < entity.x + entity.width) {
+            if (this.y + this.height > entity.y && this.y < entity.y + entity.height) {
                 return true;
             }
         }

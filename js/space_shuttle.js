@@ -2,10 +2,13 @@ function SpaceShuttle() {
     var MAX_SPEED = 6;
     var FRICTION = 0.92;
 
+    this.MAX_LIFE = 100;
+    this.MAX_LIVES = 3;
+
     // animation
     this.anim = new Animation([
-        document.getElementById('space_shuttle'),
-        document.getElementById('space_shuttle_2')
+        document.getElementById('space_shuttle_0'),
+        document.getElementById('space_shuttle_1')
     ], 100);
     // dimension
     this.width = this.anim.width;
@@ -17,6 +20,9 @@ function SpaceShuttle() {
     // velocity
     this.velX = 0;
     this.velY = 0;
+    // life
+    this.lives = this.MAX_LIVES;
+    this.life = this.MAX_LIFE;
 
     this.update = function(pressedKeys) {
         // check which direction to move
@@ -83,5 +89,11 @@ function SpaceShuttle() {
         this.y = START_Y;
         this.velX = 0;
         this.velY = 0;
+        this.lives--;
+        this.life = this.MAX_LIFE;
+    };
+
+    this.collisionWithBullet = function() {
+        this.life--;
     };
 }
