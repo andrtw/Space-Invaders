@@ -36,6 +36,7 @@ var pressedKeys = {
 var spaceShuttle = new SpaceShuttle();
 var bullets = [];
 var enemies = [];
+var explosions = [];
 var oneEnemyHasReachedTheBound = false;
 var hud = new Hud();
 var gameOver = false;
@@ -75,6 +76,14 @@ function update(delta) {
             invertEnemiesMovement();
         }
 
+        // update the explosions and remove them when they are done
+        explosions.forEach(function(explosion, index) {
+            explosion.update();
+            if (explosion.shouldDestroy()) {
+                explosions.splice(index, 1);
+            }
+        });
+
         // collision detection
         collisionSpaceShuttleEnemy();
         collisionBulletEnemy();
@@ -103,6 +112,11 @@ function render() {
         // draw the enemies
         for (enemy of enemies) {
             enemy.render(context);
+        }
+
+        // draw the explosions
+        for (explosion of explosions) {
+            explosion.render(context);
         }
 
         // draw the hud
@@ -145,9 +159,11 @@ function startNewGame() {
     spaceShuttle = new SpaceShuttle();
     bullets = [];
     enemies = [];
+    explosions = [];
     oneEnemyHasReachedTheBound = false;
     hud = new Hud();
     gameOver = false;
+
     spawnEnemyGroup();
 }
 
@@ -170,6 +186,12 @@ function spawnEnemyGroup() {
     spawnEnemy(60, );
     spawnEnemy(60, 100);
 }
+function spawnExplosion(entity) {
+    var explosion = new Explosion(entity);
+    explosions.push(explosion);
+}
+
+// enemies bounds
 function invertEnemiesMovement() {
     for (enemy of enemies) {
         enemy.invertMovement();
@@ -185,6 +207,7 @@ function collisionSpaceShuttleEnemy() {
             enemy.collisionWithSpaceShuttle();
             // destroy enemy if needed
             if (enemy.life <= 0) {
+                spawnExplosion(enemy);
                 enemies.splice(index, 1);
             }
             // decrease lives
@@ -211,6 +234,7 @@ function collisionBulletEnemy() {
                 hud.increaseScore();
                 // destroy enemy if dead
                 if (enemy.life <= 0) {
+                    spawnExplosion(enemy);
                     enemies.splice(enemyIndex, 1);
                 }
             }
