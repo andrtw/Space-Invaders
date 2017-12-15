@@ -14,7 +14,7 @@ window.addEventListener('keyup', function(event) {
     pressedKeys[key] = false;
 });
 window.addEventListener('click', function(event) {
-    if (gameOver) {
+    if (gameOver || gameWin) {
         startNewGame();
     }
 });
@@ -40,6 +40,7 @@ var explosions = [];
 var oneEnemyHasReachedTheBound = false;
 var hud = new Hud();
 var gameOver = false;
+var gameWin = false;
 
 startNewGame();
 
@@ -47,7 +48,8 @@ startNewGame();
 // == UPDATE ==
 // ============
 function update(delta) {
-    if (!gameOver) {
+
+    if (!gameOver && !gameWin) {
         // spawn new bullet
         if (pressedKeys.spacebar) {
             spawnBullet();
@@ -90,6 +92,11 @@ function update(delta) {
 
         // update the hud
         hud.update();
+
+        // no more enemies to kill (game ended or next level)
+        if (enemies.length <= 0) {
+            gameWin = true;
+        }
     }
 }
 
@@ -100,7 +107,7 @@ function render() {
     // clear the canvas
     context.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    if (!gameOver) {
+    if (!gameOver && !gameWin) {
         // draw the space shuttle
         spaceShuttle.render(context);
 
@@ -124,16 +131,16 @@ function render() {
     }
 
     if (gameOver) {
-        context.font = '30px Consolas';
-        context.fillStyle = '#ddd';
-        var text = 'GAME OVER';
-        context.fillText(text, (canvasWidth - context.measureText(text).width) / 2, canvasHeight / 2);
-        context.font = '18px Consolas';
-        text = 'With score: ' + hud.score;
-        context.fillText(text, (canvasWidth - context.measureText(text).width) / 2, canvasHeight / 2 + 30);
-        context.font = '12px Consolas';
-        text = 'Click to play again';
-        context.fillText(text, (canvasWidth - context.measureText(text).width) / 2, canvasHeight / 2 + 50);
+        textCenter('GAME OVER', -10);
+        smallTextCenter('With score: ' + hud.score, 30);
+        tinyTextCenter('Click to play again', 50);
+    }
+    else if (gameWin) {
+        textCenter('YOU WIN', -10);
+        smallTextCenter('With score: ' + hud.score, 30);
+        tinyTextCenter('Go to next level', 50);
+
+        // TODO: implement level system (never)
     }
 }
 
@@ -163,6 +170,7 @@ function startNewGame() {
     oneEnemyHasReachedTheBound = false;
     hud = new Hud();
     gameOver = false;
+    gameWin = false;
 
     spawnEnemyGroup();
 }
@@ -212,9 +220,8 @@ function collisionSpaceShuttleEnemy() {
             }
             // decrease lives
             hud.lives--;
-            // reset space shuttle position
-            spaceShuttle.x = canvasWidth / 2;
-            spaceShuttle.y = canvasHeight / 2;
+            // reset space shuttle to original position
+            spaceShuttle.die();
 
             if (hud.lives <= 0) {
                 gameOver = true;
@@ -240,4 +247,22 @@ function collisionBulletEnemy() {
             }
         });
     });
+}
+
+// write text functions
+function _textCenter(text, y) {
+    context.fillStyle = '#ddd';
+    context.fillText(text, (canvasWidth - context.measureText(text).width) / 2, canvasHeight / 2 + y);
+}
+function textCenter(text, y=0) {
+    context.font = '30px Consolas';
+    _textCenter(text, y);
+}
+function smallTextCenter(text, y=0) {
+    context.font = '18px Consolas';
+    _textCenter(text, y);
+}
+function tinyTextCenter(text, y=0) {
+    context.font = '12px Consolas';
+    _textCenter(text, y);
 }

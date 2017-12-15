@@ -1,7 +1,7 @@
-var MAX_SPEED = 6;
-var FRICTION = 0.92;
-
 function SpaceShuttle() {
+    var MAX_SPEED = 6;
+    var FRICTION = 0.92;
+
     // animation
     this.anim = new Animation([
         document.getElementById('space_shuttle'),
@@ -11,8 +11,9 @@ function SpaceShuttle() {
     this.width = this.anim.width;
     this.height = this.anim.height;
     // position
+    var START_Y = canvasHeight - this.height - 50;
     this.x = (canvasWidth - this.width) / 2;
-    this.y = canvasHeight - this.height - 50;
+    this.y = START_Y;
     // velocity
     this.velX = 0;
     this.velY = 0;
@@ -75,5 +76,12 @@ function SpaceShuttle() {
             }
         }
         return false;
+    };
+
+    this.die = function() {
+        this.x = (canvasWidth - this.width) / 2;
+        this.y = START_Y;
+        this.velX = 0;
+        this.velY = 0;
     };
 }

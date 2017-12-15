@@ -1,10 +1,7 @@
-var ENEMY_IMAGE = document.getElementById('enemy');
-
-var MAX_LIFE = 100;
-
 function Enemy(y, xOffset=0) {
-    // speed
+    var ENEMY_IMAGE = document.getElementById('enemy');
     var SPEED = 1.5;
+    var MAX_LIFE = 100;
 
     this.name = name;
     // dimension

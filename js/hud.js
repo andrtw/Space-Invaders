@@ -1,11 +1,11 @@
-var SCORE_STEP_INCREASE = 5;
-var SCORE_STEP_DECREASE = 2;
-
-var MAX_LIVES = 3;
-var HEART_IMAGE = document.getElementById('heart');
-var HEART_EMPTY_IMAGE = document.getElementById('heart_empty');
-
 function Hud() {
+    var HEART_IMAGE = document.getElementById('heart');
+    var HEART_EMPTY_IMAGE = document.getElementById('heart_empty');
+    var MAX_LIVES = 3;
+
+    var SCORE_STEP_INCREASE = 5;
+    var SCORE_STEP_DECREASE = 2;
+
     this.score = 0;
     this.lives = MAX_LIVES;
 
