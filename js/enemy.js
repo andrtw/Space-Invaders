@@ -1,6 +1,6 @@
 var ENEMY_SIZE = 20;
 
-function Enemy(canvasWidth, y, xOffset=0) {
+function Enemy(y, xOffset=0) {
     // speed
     var SPEED = 1.5;
 

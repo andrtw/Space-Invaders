@@ -28,10 +28,11 @@ var pressedKeys = {
     spacebar: false
 };
 
-var spaceShuttle = new SpaceShuttle(canvasWidth, canvasHeight);
+var spaceShuttle = new SpaceShuttle();
 var bullets = [];
 var enemies = [];
 var oneEnemyHasReachedTheBound = false;
+var hud = new Hud();
 
 startGame();
 
@@ -66,8 +67,12 @@ function update(delta) {
         invertEnemiesMovement();
     }
 
+    // collision detection
     collisionSpaceShuttleEnemy();
     collisionBulletEnemy();
+
+    // update the hud
+    hud.update();
 
 }
 
@@ -90,6 +95,9 @@ function render() {
     for (enemy of enemies) {
         enemy.render(context);
     }
+
+    // draw the hud
+    hud.render(context);
 }
 
 // ===============
@@ -120,7 +128,7 @@ function spawnBullet() {
     bullets.push(bullet);
 }
 function spawnEnemy(y, xOffset=0) {
-    var enemy = new Enemy(canvasWidth, y, xOffset);
+    var enemy = new Enemy(y, xOffset);
     enemies.push(enemy);
 }
 function spawnEnemyGroup() {
@@ -144,7 +152,13 @@ function invertEnemiesMovement() {
 function collisionSpaceShuttleEnemy() {
     enemies.forEach(function(enemy, index) {
         if (spaceShuttle.interceptsEnemy(enemy)) {
+            // destroy enemy
             enemies.splice(index, 1);
+            // decrease lives
+            hud.lives--;
+            // reset space shuttle position
+            spaceShuttle.x = canvasWidth / 2;
+            spaceShuttle.y = canvasHeight / 2;
         }
     });
 }
@@ -152,7 +166,10 @@ function collisionBulletEnemy() {
     enemies.forEach(function(enemy, index) {
         for (bullet of bullets) {
             if (bullet.interceptsEnemy(enemy)) {
+                // destroy enemy
                 enemies.splice(index, 1);
+                // increase score
+                hud.score++;
             }
         }
     });
