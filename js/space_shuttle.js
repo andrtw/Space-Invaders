@@ -1,12 +1,12 @@
-var SIZE = 20;
+var SPACE_SHUTTLE_SIZE = 20;
 
 var MAX_SPEED = 6;
 var FRICTION = 0.92;
 
 function SpaceShuttle(canvasWidth, canvasHeight) {
     // dimension
-    this.width = SIZE;
-    this.height = SIZE;
+    this.width = SPACE_SHUTTLE_SIZE;
+    this.height = SPACE_SHUTTLE_SIZE;
     // position
     this.x = (canvasWidth - this.width) / 2;
     this.y = (canvasHeight - this.height) / 2;

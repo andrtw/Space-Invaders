@@ -30,6 +30,9 @@ var pressedKeys = {
 
 var spaceShuttle = new SpaceShuttle(canvasWidth, canvasHeight);
 var bullets = [];
+var enemies = [];
+var oneEnemyHasReachedTheBound = false;
+spawnEnemyGroup();
 
 // ============
 // == UPDATE ==
@@ -51,6 +54,17 @@ function update(delta) {
         }
         bullet.update();
     });
+
+    // update the enemies
+    for (enemy of enemies) {
+        enemy.update();
+        if (enemy.boundReached()) {
+            oneEnemyHasReachedTheBound = true;
+        }
+    }
+    if (oneEnemyHasReachedTheBound) {
+        invertEnemiesMovement();
+    }
 }
 
 // ============
@@ -66,6 +80,11 @@ function render() {
     // draw the bullets
     for (bullet of bullets) {
         bullet.render(context);
+    }
+
+    // draw the enemies
+    for (enemy of enemies) {
+        enemy.render(context);
     }
 }
 
@@ -87,4 +106,24 @@ window.requestAnimationFrame(loop);
 function spawnBullet() {
     var bullet = new Bullet(spaceShuttle);
     bullets.push(bullet);
+}
+function spawnEnemy(y, xOffset=0) {
+    var enemy = new Enemy(canvasWidth, y, xOffset);
+    enemies.push(enemy);
+}
+function spawnEnemyGroup() {
+    // first row
+    spawnEnemy(10, -100);
+    spawnEnemy(10, );
+    spawnEnemy(10, 100);
+    // second row
+    spawnEnemy(60, -100);
+    spawnEnemy(60, );
+    spawnEnemy(60, 100);
+}
+function invertEnemiesMovement() {
+    for (enemy of enemies) {
+        enemy.invertMovement();
+    }
+    oneEnemyHasReachedTheBound = false;
 }
