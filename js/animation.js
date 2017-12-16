@@ -11,8 +11,7 @@ function Animation(frames, time, loop=true) {
             var now = Date.now();
             if (now - lastTime > time) {
                 currentFrame++;
-                if (currentFrame >= frames.length) {
-                    currentFrame = 0;
+                if (currentFrame > frames.length - 1) {
                     if (loop) {
                         currentFrame = 0;
                     }
